@@ -8,7 +8,7 @@ public class Dao {
 	static String user = "proj";
 	static String pass = "proj";
 	static Connection conn;
-	
+
 	public static Connection getConnect() {
 		try {
 			Class.forName("oracle.jdbc.OracleDriver");
