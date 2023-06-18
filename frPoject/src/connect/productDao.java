@@ -10,109 +10,8 @@ import java.util.Scanner;
 
 
 
-public class productDao {
-	static Scanner scn = new Scanner(System.in);
-	static productDao dao = new productDao();
-	private static String menuErrMsg = "잘못된 값을 입력했습니다.";
-	private String loginId;
+public class productDao extends register{
 	
-	Connection conn;
-	PreparedStatement psmt;
-	ResultSet rs;
-	String sql;
-
-	private void close() {
-		try {
-			if (conn != null) {
-				conn.close();
-			}
-			if (psmt != null) {
-				psmt.close();
-			}
-			if (rs != null) {
-				rs.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	// login check. id & pass => 로그인정상.
-		public boolean login(String id, String pw) {
-			sql = "select * from tbl_users where user_id=? and user_pw=?";
-			conn = Dao.getConnect();
-			try {
-				psmt = conn.prepareStatement(sql);
-				psmt.setString(1, id);
-				psmt.setString(2, pw);
-
-				rs = psmt.executeQuery();
-				if (rs.next()) {
-					return true; // id & pw 가 맞는 회원이 있다는 으미.
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				close();
-			}
-			return false;
-		}
-	
-		public void loginCheck() {
-			while (true) {
-				String id = promptString("아이디를 입력하세요");
-				String pw = promptString("비밀번호를 입력하세요");
-
-				if (dao.login(id, pw)) {
-					loginId = id;
-					return;
-				}
-				System.out.println("입력정보를 확인하세요.");
-			}
-		}
-		
-		
-		public boolean join(String id, String pw) {
-			sql = "insert into tbl_users (user_id, user_pw) "
-					+ "values(?,?) ";
-			conn = Dao.getConnect();
-			
-			try {
-				psmt = conn.prepareStatement(sql);
-				psmt.setString(1, id);
-				psmt.setString(2, pw);
-				
-				int r = psmt.executeUpdate();
-				
-				if(r>0) {
-					return true;
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}finally {
-				close();
-			}
-			return false;
-		}
-	
-	
-		public static void member() {
-			System.out.println("사용할 아이디를 입력하세요");
-			String id = scn.nextLine();
-			System.out.println("사용할 비밀번호를 입력하세요");
-			String pw = scn.nextLine();
-			
-			ProductVO prd = new ProductVO();
-			
-			prd.setUser_id(id);
-			prd.setUser_pw(pw);
-			
-			if(dao.join(id, pw)) {
-				System.out.println("회원가입이 완료되었습니다.!");
-			} else {
-				System.out.println("다시입력해주세요");
-			}
-		}
 	
 	
 	
@@ -133,7 +32,7 @@ public class productDao {
 			psmt.setInt(3, prd.getPrice());
 			psmt.setString(4, prd.getContent());
 			psmt.setInt(5, prd.getStock());
-			psmt.setString(6, dao.loginId);
+			psmt.setString(6, pda.loginId);
 
 			int r = psmt.executeUpdate();
 			if (r > 0) {
@@ -158,7 +57,7 @@ public class productDao {
 		String cont = scn.nextLine();
 		System.out.println("재고수량>");
 		int stk = Integer.parseInt(scn.nextLine());
-
+		
 		ProductVO prd = new ProductVO();
 
 		prd.setProduct_id(id);
@@ -166,7 +65,6 @@ public class productDao {
 		prd.setPrice(pr);
 		prd.setContent(cont);
 		prd.setStock(stk);
-		prd.setUser_id(dao.loginId);
 		if (dao.input(prd)) {
 			System.out.println("처리성공");
 		} else {
@@ -192,6 +90,7 @@ public class productDao {
 				prd.setProduct_id(rs.getString(2));
 				prd.setProduct_name(rs.getString(3));
 				prd.setPrice(rs.getInt(4));
+				
 				prd.setContent(rs.getString(5));
 				prd.setStock(rs.getInt(6));
 				prd.setUser_id(rs.getString(7));
