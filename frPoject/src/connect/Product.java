@@ -5,7 +5,6 @@ import java.util.Scanner;
 
 public class Product extends productDao {
 	public static void main(String[] args) {
-		register hi =new register();
 		int menu = 0;
 		while (true) {
 			System.out.println("1.로그인 2.회원가입");
@@ -15,7 +14,7 @@ public class Product extends productDao {
 				boolean run = true;
 //				List<ProductVO> list = pda.list();
 //				for(int i = 0; i < list.size(); i++ ) {
-					if(hi.getVariety().equals("r")) {
+					if(prd.getVariety().equals("r")) {
 					
 					while (run) {
 						System.out.println("1.상품등록 2.상품목록 3.나의상품 4.상품수정 5.상품삭제 6. 입/출고 관리 7. 로그아웃");
