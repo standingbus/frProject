@@ -18,7 +18,7 @@ public class ProductVO {
 	 String user_pw;
 	 String loginId;
 	 String name;
-	 String tel;
+	 int tel;
 	
 	
 	

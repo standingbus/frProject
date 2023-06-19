@@ -66,9 +66,9 @@ public class productDao extends register{
 		prd.setContent(cont);
 		prd.setStock(stk);
 		if (dao.input(prd)) {
-			System.out.println("처리성공");
+			System.out.println("등록 완료되었습니다.");
 		} else {
-			System.out.println("처리실패");
+			System.out.println("같은 이름의 상품이 있습니다.");
 		}
 	}
 
@@ -158,12 +158,12 @@ public class productDao extends register{
 	// 수정
 	public boolean modify(ProductVO prd) {
 		sql = " update tbl_product " 
-				+ "set  product_id = nvl(? , product_name),"
+				+ "set  product_id = nvl(? , product_id),"
 				+ "		price = nvl(?, price)," 
 				+ " 	content = nvl(?, content),"
 				+ "		stock = nvl(?, stock)," 
 				+ " 	user_id = nvl(?,user_id)"					
-				+ " where product_name = ?"
+				+ " where product_name = ? and user_id = ?"
 				;
 
 		conn = Dao.getConnect();
@@ -176,6 +176,7 @@ public class productDao extends register{
 			psmt.setInt(4, prd.getStock());
 			psmt.setString(5, prd.getUser_id());
 			psmt.setString(6, prd.getProduct_name());
+			psmt.setString(7, pda.loginId);
 			
 			int r = psmt.executeUpdate();
 			if (r > 0) {
@@ -197,7 +198,7 @@ public class productDao extends register{
 		prd.setProduct_name(name);
 		boolean istru = true;
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).getProduct_name().equals(name) && istru) {
+			if (list.get(i).getProduct_name().equals(name) && list.get(i).getUser_id().equals(pda.loginId)) {
 
 				System.out.println("무엇을 변경할까요?");
 				System.out.println("1.가격 2.내용 3.재고수량");
@@ -217,20 +218,26 @@ public class productDao extends register{
 				} else {
 					istru = false;
 					System.out.println("1,2,3 중에 골라주세요");
+					continue;
 				}
 				if (dao.modify(prd)) {
 					System.out.println("정상수정");
 				} else {
-					System.out.println("상품이 없습니다.");
+					System.out.println("등록되어진 상품이 없습니다.");
 				}
 			}
+			else if(list.get(i).getProduct_name().equals(name) && list.get(i).getUser_id() != pda.loginId) {
+				System.out.println("권한이 없습니다.");
+				break;
+			}
 		}
+		
 	}
 
 	
 	public boolean cut(ProductVO prd) {
 		sql = "delete from tbl_product"
-				+ " where product_name = ?"
+				+ " where product_name = ? and user_id = ?"
 				;
 		
 		conn = Dao.getConnect();
@@ -238,6 +245,7 @@ public class productDao extends register{
 		try {
 			psmt = conn.prepareStatement(sql);
 			psmt.setString(1, prd.getProduct_name());
+			psmt.setString(2, pda.loginId);
 			
 			int r = psmt.executeUpdate();
 			if(r>0) {
@@ -257,11 +265,11 @@ public class productDao extends register{
 		System.out.println("삭제할 상품을 입력해주세요");
 		String name = scn.nextLine();
 		prd.setProduct_name(name);
-		
+//		prd.setUser_id(pda.getLoginId());
 		if(dao.cut(prd)) {
 			System.out.println("정상수정");
 		}else {
-			System.out.println("상품이없습니다.");
+			System.out.println("등록한 상품이없거나 권한이 없습니다.");
 		}
 		
 	}
@@ -270,7 +278,7 @@ public class productDao extends register{
 		public boolean inPut(ProductVO prd) {
 			sql = " update tbl_product " 
 					+ "set stock = stock + ? " 
-					+ "where product_name = ?";
+					+ "where product_name = ? and user_id = ?";
 
 			conn = Dao.getConnect();
 
@@ -278,6 +286,7 @@ public class productDao extends register{
 				psmt = conn.prepareStatement(sql);
 				psmt.setInt(1, prd.getStock());
 				psmt.setString(2, prd.getProduct_name());
+				psmt.setString(3, pda.loginId);
 				
 				int r = psmt.executeUpdate();
 				if(r >0) {
@@ -294,7 +303,7 @@ public class productDao extends register{
 		public boolean outPut(ProductVO prd) {
 			sql = " update tbl_product " 
 					+ "set stock =  ? " 
-					+ "where product_name = ?";
+					+ "where product_name = ? and user_id = ?";
 
 			conn = Dao.getConnect();
 		
@@ -302,6 +311,7 @@ public class productDao extends register{
 				psmt = conn.prepareStatement(sql);
 				psmt.setInt(1, prd.getStock());
 				psmt.setString(2, prd.getProduct_name());
+				psmt.setString(3, pda.loginId);
 				
 				int r = psmt.executeUpdate();
 				if(r >0) {
@@ -323,7 +333,7 @@ public class productDao extends register{
 			prd.setProduct_name(name);
 			boolean istru = true;
 			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i).getProduct_name().equals(name) && istru) {
+				if (list.get(i).getProduct_name().equals(name) && list.get(i).getUser_id().equals(pda.loginId) ) {
 					System.out.println("1.입고 2.출고");
 					int menu = Integer.parseInt(scn.nextLine());
 					if (menu == 1) {
@@ -333,14 +343,14 @@ public class productDao extends register{
 						if(dao.inPut(prd)) {
 							System.out.println("정상수정");
 						} else {
-							System.out.println("상품이 없습니다.");
+							System.out.println("등록하신 상품이 없습니다.");
 						}
 					} else if (menu == 2) {
 						System.out.println("출고 개수를 입력해주세요");
 						int cnt = Integer.parseInt(scn.nextLine());
 						
 						if(list.get(i).getStock() - cnt < 0) {
-							System.out.println("ss");
+							System.out.println("상품개수가 부족합니다 현재 출고 가능한 개수는 " + list.get(i).getStock() + "입니다");
 							continue;
 						}else {
 							prd.setStock(list.get(i).getStock() - cnt );
@@ -349,13 +359,16 @@ public class productDao extends register{
 						if(dao.outPut(prd)) {
 							System.out.println("정상수정");
 						} else {
-							System.out.println("상품이 없습니다.");
+							System.out.println("등록하신 상품이 없습니다.");
 						}
 					} else {
 						System.out.println("1,2 중에 골라주세요");
 						istru = false;
 					}
-
+				}
+				else if(list.get(i).getProduct_name().equals(name) && list.get(i).getUser_id() != pda.loginId) {
+					System.out.println("권한이 없습니다.");
+					break;
 				}
 			}
 		}

@@ -67,20 +67,23 @@ public class register extends ProductVO  {
 					loginId = id;
 					return;
 				}
-				System.out.println("입력정보를 확인하세요.");
+				System.out.println("아이디 혹은 비밀번호 오류입니다 다시 확인해주세요");
 			}
+			
 		}
 		
 		
-		public boolean join(String id, String pw) {
-			sql = "insert into tbl_register (user_id, user_pw) "
-					+ "values(?,?) ";
+		public boolean join(String id, String pw, String name, int tel) {
+			sql = "insert into register (user_id, user_pw, name, tel) "
+					+ "values(?,?,?,?) ";
 			conn = Dao.getConnect();
 			
 			try {
 				psmt = conn.prepareStatement(sql);
 				psmt.setString(1, id);
 				psmt.setString(2, pw);
+				psmt.setString(3, name);
+				psmt.setInt(4, tel);
 				
 				int r = psmt.executeUpdate();
 				
@@ -101,13 +104,19 @@ public class register extends ProductVO  {
 			String id = scn.nextLine();
 			System.out.println("사용할 비밀번호를 입력하세요");
 			String pw = scn.nextLine();
-			
+			System.out.println("이름을 입력해주세요");
+			String name = scn.nextLine();
+			System.out.println("전화번호 입력해주세요 (-)제외");
+			int tel = Integer.parseInt(scn.nextLine());
 			ProductVO prd = new ProductVO();
 			
 			prd.setUser_id(id);
 			prd.setUser_pw(pw);
+			prd.setName(name);
+			prd.setTel(tel);
 			
-			if(dao.join(id, pw)) {
+			
+			if(dao.join(id, pw, name, tel)) {
 				System.out.println("회원가입이 완료되었습니다.!");
 			} else {
 				System.out.println("다시입력해주세요");
@@ -141,7 +150,7 @@ public class register extends ProductVO  {
 					prd.setProduct_id(rs.getString(2));
 					prd.setProduct_name(rs.getString(3));
 					prd.setPrice(rs.getInt(4));
-					prd.setName(rs.getString("register.name"));
+					prd.setName(rs.getString(rs.getString(getName())));
 					prd.setContent(rs.getString(5));
 					prd.setStock(rs.getInt(6));
 					prd.setUser_id(rs.getString(7));
@@ -161,7 +170,7 @@ public class register extends ProductVO  {
 			} else {
 				for (int i = 0; i < list.size(); i++) {
 					if(list.get(i).getUser_id().equals(pda.loginId)) {
-						System.out.println(prd);
+						System.out.printf("상품명 : %s, 가격 : %d, 등록자 : %s \n", list.get(i).getProduct_name(), list.get(i).getPrice(), list.get(i).getUser_id());
 						
 					}
 				}
