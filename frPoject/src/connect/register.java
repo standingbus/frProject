@@ -39,7 +39,7 @@ public class register extends ProductVO  {
 	
 	// login check. id & pass => 로그인정상.
 		public boolean login(String id, String pw) {
-			sql = "select * from register where user_id=? and user_pw=?";
+			sql = "select * from tbl_users where user_id=? and user_pw=?";
 			conn = Dao.getConnect();
 			try {
 				psmt = conn.prepareStatement(sql);
@@ -73,9 +73,9 @@ public class register extends ProductVO  {
 		}
 		
 		
-		public boolean join(String id, String pw, String name, int tel) {
-			sql = "insert into register (user_id, user_pw, name, tel) "
-					+ "values(?,?,?,?) ";
+		public boolean join(String id, String pw, String name, int tel, String addr, String variety) {
+			sql = "insert into tbl_users (user_id, user_pw, name, tel, addr, variety) "
+					+ "values(?,?,?,?,?,?) ";
 			conn = Dao.getConnect();
 			
 			try {
@@ -84,6 +84,8 @@ public class register extends ProductVO  {
 				psmt.setString(2, pw);
 				psmt.setString(3, name);
 				psmt.setInt(4, tel);
+				psmt.setString(5, addr);
+				psmt.setString(6, variety);
 				
 				int r = psmt.executeUpdate();
 				
@@ -100,6 +102,11 @@ public class register extends ProductVO  {
 	
 	
 		public static void member() {
+			System.out.println("1.상품등록 2.상품구매");
+			int num = Integer.parseInt(scn.nextLine());
+			
+			if(num == 1) {
+				
 			System.out.println("사용할 아이디를 입력하세요");
 			String id = scn.nextLine();
 			System.out.println("사용할 비밀번호를 입력하세요");
@@ -108,18 +115,48 @@ public class register extends ProductVO  {
 			String name = scn.nextLine();
 			System.out.println("전화번호 입력해주세요 (-)제외");
 			int tel = Integer.parseInt(scn.nextLine());
+			System.out.println("주소를 입력하세요");
+			String addr =scn.nextLine();
+			String variety = "r";
 			ProductVO prd = new ProductVO();
 			
 			prd.setUser_id(id);
 			prd.setUser_pw(pw);
 			prd.setName(name);
 			prd.setTel(tel);
-			
-			
-			if(dao.join(id, pw, name, tel)) {
+			prd.setAddr(addr);
+			prd.setVariety(variety);
+			if(dao.join(id, pw, name, tel, addr, variety)) {
 				System.out.println("회원가입이 완료되었습니다.!");
 			} else {
 				System.out.println("다시입력해주세요");
+			}
+			} else {
+					
+					System.out.println("사용할 아이디를 입력하세요");
+					String id = scn.nextLine();
+					System.out.println("사용할 비밀번호를 입력하세요");
+					String pw = scn.nextLine();
+					System.out.println("이름을 입력해주세요");
+					String name = scn.nextLine();
+					System.out.println("전화번호 입력해주세요 (-)제외");
+					int tel = Integer.parseInt(scn.nextLine());
+					System.out.println("주소를 입력하세요");
+					String addr =scn.nextLine();
+					String variety = "b";
+					ProductVO prd = new ProductVO();
+					
+					prd.setUser_id(id);
+					prd.setUser_pw(pw);
+					prd.setName(name);
+					prd.setTel(tel);
+					prd.setAddr(addr);
+					
+					if(dao.join(id, pw, name, tel, addr, variety)) {
+						System.out.println("회원가입이 완료되었습니다.!");
+					} else {
+						System.out.println("다시입력해주세요");
+					}
 			}
 		}
 		

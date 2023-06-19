@@ -19,6 +19,8 @@ public class ProductVO {
 	 String loginId;
 	 String name;
 	 int tel;
+	 String addr;
+	 String variety;
 	
 	
 	

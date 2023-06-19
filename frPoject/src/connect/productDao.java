@@ -68,7 +68,7 @@ public class productDao extends register{
 		if (dao.input(prd)) {
 			System.out.println("등록 완료되었습니다.");
 		} else {
-			System.out.println("같은 이름의 상품이 있습니다.");
+			System.out.println("같은 이름의 상품이 있습니다");
 		}
 	}
 
